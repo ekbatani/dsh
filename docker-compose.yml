@@ -3,12 +3,18 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "${DSH_PORT:-3000}:3000"
+      - "3080:3080"
     environment:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
     volumes:
       - dsh-data:/home/node/.dsh
       - ./workspace:/workspace
+    networks:
+      - dokploy-network
 
 volumes:
   dsh-data:
+
+networks:
+  dokploy-network:
+    external: true
