@@ -1,25 +1,14 @@
 services:
   deepseek-harness:
     build: .
-    container_name: deepseek-harness
     restart: unless-stopped
     ports:
       - "${DSH_PORT:-3000}:3000"
     environment:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
     volumes:
-      # Persists configurations, plugins, and session state
       - dsh-data:/home/node/.dsh
-      # Mount the project folder you want the agent to work on
       - ./workspace:/workspace
-    security_opt:
-      - no-new-privileges:true
-    # Cap CPU and RAM to prevent runaway agent loops
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
 
 volumes:
   dsh-data:
