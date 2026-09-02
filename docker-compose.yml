@@ -7,6 +7,7 @@ services:
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENCODE_API_KEY=${OPENCODE_API_KEY}
+      - DSH_TRUSTED_HOSTS=dsh.fixo24.com
     volumes:
       - dsh-data:/home/node/.dsh
       - ./workspace:/workspace
