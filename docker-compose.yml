@@ -16,24 +16,19 @@ services:
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
 
-      # HTTP Router (Redirect to HTTPS)
-      - traefik.http.routers.harness-dsh-agzlzv-17-web.rule=Host(`dsh.fixo24.com`)
+      # HTTP Router (Redirect to HTTPS for both domains)
+      - "traefik.http.routers.harness-dsh-agzlzv-17-web.rule=Host(`dsh.fixo24.com`) || Host(`dsh-api.fixo24.com`)"
       - traefik.http.routers.harness-dsh-agzlzv-17-web.entrypoints=web
       - traefik.http.services.harness-dsh-agzlzv-17-web.loadbalancer.server.port=3080
       - traefik.http.routers.harness-dsh-agzlzv-17-web.service=harness-dsh-agzlzv-17-web
       - traefik.http.routers.harness-dsh-agzlzv-17-web.middlewares=redirect-to-https@file
 
-      # Define the Header Spoof Middleware
-      - traefik.http.middlewares.dsh-local-headers.headers.customrequestheaders.Host=127.0.0.1:3081
-      - traefik.http.middlewares.dsh-local-headers.headers.customrequestheaders.Origin=http://127.0.0.1:3081
-
-      # HTTPS Router (Applies SSL and the local headers middleware)
-      - traefik.http.routers.harness-dsh-agzlzv-17-websecure.rule=Host(`dsh.fixo24.com`)
+      # HTTPS Router (SSL + Let's Encrypt for both domains)
+      - "traefik.http.routers.harness-dsh-agzlzv-17-websecure.rule=Host(`dsh.fixo24.com`) || Host(`dsh-api.fixo24.com`)"
       - traefik.http.routers.harness-dsh-agzlzv-17-websecure.entrypoints=websecure
       - traefik.http.services.harness-dsh-agzlzv-17-websecure.loadbalancer.server.port=3080
       - traefik.http.routers.harness-dsh-agzlzv-17-websecure.service=harness-dsh-agzlzv-17-websecure
       - traefik.http.routers.harness-dsh-agzlzv-17-websecure.tls.certresolver=letsencrypt
-      - traefik.http.routers.harness-dsh-agzlzv-17-websecure.middlewares=dsh-local-headers
 
 volumes:
   dsh-data: null
