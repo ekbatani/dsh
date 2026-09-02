@@ -1,26 +1,29 @@
 FROM node:22-bookworm-slim
 
-# Install system dependencies
+# Install system dependencies + socat
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     ca-certificates \
     build-essential \
     python3 \
+    socat \
     && rm -rf /var/lib/apt/lists/*
 
-# Install global NPM packages as root
+# Install global NPM packages
 RUN npm install -g @deepseek-ai/dsh
 
-# Prepare workspace and config directories with non-root ownership
+# Setup workspace and directories
 RUN mkdir -p /workspace /home/node/.dsh && \
     chown -R node:node /workspace /home/node
 
-# Switch to non-root user for runtime
+# Copy startup script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER node
 WORKDIR /workspace
 
 EXPOSE 3080
 
-ENTRYPOINT ["dsh"]
-CMD ["web", "--host", "0.0.0.0", "--port", "3080"]
+ENTRYPOINT ["/entrypoint.sh"]
