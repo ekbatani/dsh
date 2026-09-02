@@ -1,0 +1,22 @@
+services:
+  dsh:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: dsh
+    restart: unless-stopped
+
+    ports:
+      - "${DSH_PORT:-3000}:3000"
+
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+
+    volumes:
+      - dsh_data:/root/.dsh
+      - ./workspace:/workspace
+
+volumes:
+  dsh_data:
