@@ -6,6 +6,8 @@ services:
       - 3080:3080
     environment:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENCODE_API_KEY=${OPENCODE_API_KEY}
     volumes:
       - dsh-data:/home/node/.dsh
       - ./workspace:/workspace
