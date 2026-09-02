@@ -1,6 +1,6 @@
 FROM node:22-bookworm-slim
 
-# Install standard developer tooling required by the agent
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
@@ -9,14 +9,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Use the non-root node user
-USER node
-WORKDIR /home/node
-
-# Globally install the DeepSeek Harness CLI
+# Install global NPM packages as root
 RUN npm install -g @deepseek-ai/dsh
 
-# Set the active project directory
+# Prepare workspace and config directories with non-root ownership
+RUN mkdir -p /workspace /home/node/.dsh && \
+    chown -R node:node /workspace /home/node
+
+# Switch to non-root user for runtime
+USER node
 WORKDIR /workspace
 
 EXPOSE 3080
