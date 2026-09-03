@@ -1,6 +1,6 @@
 FROM node:22-bookworm-slim
 
-# Install system dependencies + socat
+# Install system dependencies + socat + gosu
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     python3 \
     socat \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # Install global NPM packages
@@ -21,7 +22,6 @@ RUN mkdir -p /workspace /home/node/.dsh && \
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-USER node
 WORKDIR /workspace
 
 EXPOSE 3080
