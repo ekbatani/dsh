@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  deepseek-harness:
+  dsh:
     build: .
     restart: unless-stopped
     ports:
@@ -16,27 +18,29 @@ services:
       - ./workspace:/workspace
     networks:
       - dokploy-network
-      - default
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=dokploy-network
+      - "traefik.enable=true"
 
-      # HTTP Router (Redirect to HTTPS for both domains)
-      - "traefik.http.routers.harness-dsh-agzlzv-17-web.rule=Host(`dsh.fixo24.com`) || Host(`dsh-api.fixo24.com`)"
-      - traefik.http.routers.harness-dsh-agzlzv-17-web.entrypoints=web
-      - traefik.http.services.harness-dsh-agzlzv-17-web.loadbalancer.server.port=3080
-      - traefik.http.routers.harness-dsh-agzlzv-17-web.service=harness-dsh-agzlzv-17-web
-      - traefik.http.routers.harness-dsh-agzlzv-17-web.middlewares=redirect-to-https@file
+      # 1. Main Web Panel (dsh.fixo24.com)
+      - "traefik.http.routers.dsh-web.rule=Host(`dsh.fixo24.com`)"
+      - "traefik.http.routers.dsh-web.entrypoints=websecure"
+      - "traefik.http.routers.dsh-web.tls=true"
+      - "traefik.http.routers.dsh-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dsh-web.service=dsh-svc"
 
-      # HTTPS Router (SSL + Let's Encrypt for both domains)
-      - "traefik.http.routers.harness-dsh-agzlzv-17-websecure.rule=Host(`dsh.fixo24.com`) || Host(`dsh-api.fixo24.com`)"
-      - traefik.http.routers.harness-dsh-agzlzv-17-websecure.entrypoints=websecure
-      - traefik.http.services.harness-dsh-agzlzv-17-websecure.loadbalancer.server.port=3080
-      - traefik.http.routers.harness-dsh-agzlzv-17-websecure.service=harness-dsh-agzlzv-17-websecure
-      - traefik.http.routers.harness-dsh-agzlzv-17-websecure.tls.certresolver=letsencrypt
+      # 2. Settings & Remote API (dsh-api.fixo24.com)
+      - "traefik.http.routers.dsh-api.rule=Host(`dsh-api.fixo24.com`)"
+      - "traefik.http.routers.dsh-api.entrypoints=websecure"
+      - "traefik.http.routers.dsh-api.tls=true"
+      - "traefik.http.routers.dsh-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dsh-api.service=dsh-svc"
+
+      # 3. Port & Header Forwarding
+      - "traefik.http.services.dsh-svc.loadbalancer.server.port=3080"
+      - "traefik.http.services.dsh-svc.loadbalancer.passHostHeader=true"
 
 volumes:
-  dsh-data: null
+  dsh-data:
 
 networks:
   dokploy-network:
